@@ -5,41 +5,71 @@ using System.Threading;
 using UnityEditor.Experimental;
 using UnityEngine;
 using UnityEngine.EventSystems;
+using UnityEngine.UIElements;
 
 public class CarMovement : MonoBehaviour
 {
-    Rigidbody2D rb;
+    private bool build = true;
+    private NeuralNetWork net;
 
-    public float speed = 1f;
+    float speed = 2f;
+    float rotateSpeed = 25f;
 
+    private int[] layers; 
     public float rayDistance = 10f;
-
-    public float[] inputRays = new float[5];
-    public RaycastHit2D[] rays = new RaycastHit2D[5];
+    private float[] inputRays = new float[5];
+    private RaycastHit2D[] rays = new RaycastHit2D[5];
     // Start is called before the first frame update
+
+    private List<Collider> colliders = new List<Collider>();
+    private float treat = 15f;
     void Start()
     {
-        rb = GetComponent<Rigidbody2D>();
+        net = new NeuralNetWork(layers);
+    }
+
+    public void initCar(NeuralNetWork net)
+    {
+        this.net = net;
+        build = true;
     }
 
     private void FixedUpdate()
     {
         castRays();
 
-        if (Input.GetKey(KeyCode.W))
+        if (build)
         {
-            transform.position += speed * transform.up * Time.deltaTime;
-        }
-        if (Input.GetKey(KeyCode.S))
-        {
-            transform.position -= speed * transform.up * Time.deltaTime;
+            castRays();
+
+            float[] outPut = net.feedForward(inputRays);
+
+            transform.position += outPut[0] * transform.up * Time.deltaTime * speed;
+
+            transform.Rotate(0, 0, outPut[1] * Time.deltaTime * rotateSpeed);
         }
     }
 
     private void OnCollisionEnter2D(Collision2D collision)
     {
         Debug.Log("colission");
+        build = false;
+        net.addFitness(15 - colliders.Count);
         speed = 0;
+    }
+
+    private void OnTriggerEnter(Collider other)
+    {
+        if (colliders.Contains(other) == false) 
+        {
+            colliders.Add(other);
+            net.addFitness(colliders.Count + 1);
+        }
+        else if (colliders.Count  >= 15)
+        {
+            colliders.Clear();
+            net.addFitness(colliders.Count * 3);
+        }
     }
 
     public void castRays()
@@ -64,15 +94,9 @@ public class CarMovement : MonoBehaviour
         rays[3] = rayRightFront;
         rays[4] = rayRight;
 
-        int count = 0;
-
-        foreach (RaycastHit2D rayHit in rays)
+        for (int i = 0; i < rays.Length; i++)
         {
-            inputRays[count] = rayHit.distance;
-            Debug.Log(count);
-            count++;
+            inputRays[i] = rays[i].distance;
         }
-
-        count = 0;
     }
 }
