@@ -21,6 +21,9 @@ public class CarMovement : MonoBehaviour
     private RaycastHit2D[] rays = new RaycastHit2D[5];
     // Start is called before the first frame update
 
+    private float totalDistance = 0;
+    private Vector3 previousLoc;
+
     private List<Collider> colliders = new List<Collider>();
     private float treat = 15f;
     void Start()
@@ -47,6 +50,9 @@ public class CarMovement : MonoBehaviour
             transform.position += outPut[0] * transform.up * Time.deltaTime * speed;
 
             transform.Rotate(0, 0, outPut[1] * Time.deltaTime * rotateSpeed);
+
+            RecordDistance();
+            net.setFitness(totalDistance);
         }
     }
 
@@ -57,7 +63,13 @@ public class CarMovement : MonoBehaviour
         net.addFitness(15 - colliders.Count);
         speed = 0;
     }
+    void RecordDistance()
+    {
+        totalDistance += Vector3.Distance(transform.position, previousLoc);
+        previousLoc = transform.position;
+    }
 
+    /*
     private void OnTriggerEnter(Collider other)
     {
         if (colliders.Contains(other) == false) 
@@ -70,7 +82,7 @@ public class CarMovement : MonoBehaviour
             colliders.Clear();
             net.addFitness(colliders.Count * 3);
         }
-    }
+    }*/
 
     public void castRays()
     {
