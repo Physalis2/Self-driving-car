@@ -13,18 +13,23 @@ public class CarMovement : MonoBehaviour
     private NeuralNetWork net;
 
     float speed = 2f;
-    float rotateSpeed = 25f;
+    float rotateSpeed = 50f;
+    float currspeed = 0;
+
+    public Rigidbody2D rb;
 
     private int[] layers; 
     public float rayDistance = 10f;
-    private float[] inputRays = new float[5];
+    private float[] inputs = new float[6];
     private RaycastHit2D[] rays = new RaycastHit2D[5];
     // Start is called before the first frame update
 
-    private List<Collider> colliders = new List<Collider>();
-    private float treat = 15f;
+    private float totalDistance = 0;
+    private Vector3 previousLoc;
+
     void Start()
     {
+        rb = GetComponent<Rigidbody2D>();
         net = new NeuralNetWork(layers);
     }
 
@@ -37,16 +42,20 @@ public class CarMovement : MonoBehaviour
     private void FixedUpdate()
     {
         castRays();
-
+      
         if (build)
         {
+            currspeed = rb.velocity.magnitude;
             castRays();
 
-            float[] outPut = net.feedForward(inputRays);
+            float[] outPut = net.feedForward(inputs);
 
             transform.position += outPut[0] * transform.up * Time.deltaTime * speed;
 
             transform.Rotate(0, 0, outPut[1] * Time.deltaTime * rotateSpeed);
+
+            RecordDistance();
+            net.setFitness(totalDistance);
         }
     }
 
@@ -54,22 +63,27 @@ public class CarMovement : MonoBehaviour
     {
         Debug.Log("colission");
         build = false;
-        net.addFitness(15 - colliders.Count);
+        net.setFitness(net.getFitness() * 0.7f);
         speed = 0;
+    }
+    void RecordDistance()
+    {
+        Vector2 currentMovement = (transform.position - previousLoc);
+        if (currentMovement.y > 0)
+        {
+            totalDistance += Vector2.Distance(transform.position, previousLoc);
+            previousLoc = transform.position;
+        }
+        if (currentMovement.y > 0)
+        {
+            totalDistance -= Vector2.Distance(transform.position, previousLoc);
+            previousLoc = transform.position;
+        }
     }
 
     private void OnTriggerEnter(Collider other)
     {
-        if (colliders.Contains(other) == false) 
-        {
-            colliders.Add(other);
-            net.addFitness(colliders.Count + 1);
-        }
-        else if (colliders.Count  >= 15)
-        {
-            colliders.Clear();
-            net.addFitness(colliders.Count * 3);
-        }
+        net.addFitness(-120);
     }
 
     public void castRays()
@@ -93,10 +107,15 @@ public class CarMovement : MonoBehaviour
         rays[2] = rayFront;
         rays[3] = rayRightFront;
         rays[4] = rayRight;
+        loadInputs();
+    }
 
+    public void loadInputs() 
+    {
         for (int i = 0; i < rays.Length; i++)
         {
-            inputRays[i] = rays[i].distance;
+            inputs[i] = rays[i].distance;
         }
+        inputs[5] = currspeed;
     }
 }
