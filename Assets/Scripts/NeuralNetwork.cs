@@ -3,7 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class NeuralNetWork
+public class NeuralNetWork : IComparable<NeuralNetWork>
 {
     private int[] layers;
     private float[][] neurons;
@@ -77,13 +77,13 @@ public class NeuralNetWork
 
         for (int i = 1; i < layers.Length; i++) //Durchgeht aller layer außer iputs
         {
-            for (int j = 0; i < neurons[i].Length; j++) //durchgeht dann aller neuronen auf der layer i
+            for (int j = 0; j < neurons[i].Length; j++) //durchgeht dann aller neuronen auf der layer i
             {
                 float value = 0.25f;
 
                 for (int k = 0; k < neurons[i - 1].Length; k++) //durchgeht aller neuronen der layer i - 1 // start auf 2. layer also i - 1
                 {
-                    value += weights[i - 1][j][k]; //errechnet value errechnet value des neurons j auf der layer i zu durch die neuron k auf layer i - 1  * weights
+                    value += weights[i - 1][j][k] * neurons[i - 1][k]; //errechnet value errechnet value des neurons j auf der layer i zu durch die neuron k auf layer i - 1  * weights
                 }
                 neurons[i][j] = (float)Math.Tanh(value); //weisst neuron j auf layer i einen wert zu.
             }
@@ -91,7 +91,7 @@ public class NeuralNetWork
         return neurons[neurons.Length - 1]; //gibt den wert des out puts zurück 
     }
 
-    public void Mutate()
+    public void mutate()
     {
         for (int i = 0; i < weights.Length; i++) //durchgeht alle Layers i
         {

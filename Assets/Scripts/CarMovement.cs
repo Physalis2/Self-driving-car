@@ -8,37 +8,39 @@ using UnityEngine.EventSystems;
 
 public class CarMovement : MonoBehaviour
 {
-    Rigidbody2D rb;
+    private bool build = false;
+    private NeuralNetWork net;
 
     public float speed = 1f;
 
+    private int[] layers = new int[] { 5, 4, 4, 2 };
     public float rayDistance = 10f;
-
     public float[] inputRays = new float[5];
     public RaycastHit2D[] rays = new RaycastHit2D[5];
     // Start is called before the first frame update
     void Start()
     {
-        rb = GetComponent<Rigidbody2D>();
+        net = new NeuralNetWork(layers);
     }
 
     private void FixedUpdate()
     {
-        castRays();
+        if (build)
+        {
+            castRays();
 
-        if (Input.GetKey(KeyCode.W))
-        {
-            transform.position += speed * transform.up * Time.deltaTime;
-        }
-        if (Input.GetKey(KeyCode.S))
-        {
-            transform.position -= speed * transform.up * Time.deltaTime;
+            float[] outPut = net.feedForward(inputRays);
+
+            transform.position += outPut[1] * transform.up * Time.deltaTime;
+
+            transform.Rotate(0, 0, outPut[0]);
         }
     }
 
     private void OnCollisionEnter2D(Collision2D collision)
     {
         Debug.Log("colission");
+        build = true;
         speed = 0;
     }
 
@@ -64,15 +66,9 @@ public class CarMovement : MonoBehaviour
         rays[3] = rayRightFront;
         rays[4] = rayRight;
 
-        int count = 0;
-
-        foreach (RaycastHit2D rayHit in rays)
+        for (int i = 0; i < rays.Length; i++)
         {
-            inputRays[count] = rayHit.distance;
-            Debug.Log(count);
-            count++;
+            inputRays[i] = rays[i].distance;
         }
-
-        count = 0;
     }
 }
