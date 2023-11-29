@@ -65,7 +65,7 @@ sysinfo.txt
 crashlytics-build.properties
 
 # Usersettings
-.dwlt	
+*.dwlt	
 
 # Packed Addressables
 /[Aa]ssets/[Aa]ddressable[Aa]ssets[Dd]ata/*/*.bin*
