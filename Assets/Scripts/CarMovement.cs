@@ -79,7 +79,7 @@ public class CarMovement : MonoBehaviour
             totalDistance -= Vector2.Distance(transform.position, previousLoc);
             previousLoc = transform.position;
         }
-    }*/
+    }
 
     private void OnTriggerEnter(Collider other)
     {
