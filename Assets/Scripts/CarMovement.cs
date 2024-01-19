@@ -58,7 +58,6 @@ public class CarMovement : MonoBehaviour
             net.setFitness(totalDistance);
         }
     }
-
     private void OnCollisionEnter2D(Collision2D collision)
     {
         Debug.Log("colission");
