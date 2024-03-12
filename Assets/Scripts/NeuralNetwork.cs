@@ -36,7 +36,7 @@ public class NeuralNetWork : IComparable<NeuralNetWork>
         }
 
 
-        InitNeurons(); //sind glaich, da abhänig von Layers[]
+        InitNeurons(); //sind gleich, da abhÃ¤nig von Layers[]
         InitWeights(); // ""
         CopyWeights(copyNetwork.weights); //nicht identisch random 
     }
@@ -62,8 +62,8 @@ public class NeuralNetWork : IComparable<NeuralNetWork>
 
         for (int i = 0; i < layers.Length; ++i) //durch layers bewegen
         {
-            neuronList.Add(new float[layers[i]]);//Hinzufügen der layer anzahl neurons[x][]
-                                                 //layer[i] enthält anzahl neuronen in layer i => neurons[i][x]
+            neuronList.Add(new float[layers[i]]);//HinzufÃ¼gen der layer anzahl neurons[x][]
+                                                 //layer[i] enthÃ¤lt anzahl neuronen in layer i => neurons[i][x]
         }
 
         neurons = neuronList.ToArray();
@@ -103,7 +103,7 @@ public class NeuralNetWork : IComparable<NeuralNetWork>
             neurons[0][i] = inputs[i]; //neuron i auf layer 0 bekommt input von i zugewiesen => neuron i = iput i
         }
 
-        for (int i = 1; i < layers.Length; i++) //Durchgeht aller layer außer iputs
+        for (int i = 1; i < layers.Length; i++) //Durchgeht aller layer auÃŸer iputs
         {
             for (int j = 0; j < neurons[i].Length; j++) //durchgeht dann aller neuronen auf der layer i
             {
@@ -116,7 +116,7 @@ public class NeuralNetWork : IComparable<NeuralNetWork>
                 neurons[i][j] = (float)Math.Tanh(value); //weisst neuron j auf layer i einen wert zu.
             }
         }
-        return neurons[neurons.Length - 1]; //gibt den wert des out puts zurück 
+        return neurons[neurons.Length - 1]; //gibt den wert des out puts zurÃ¼ck 
     }
 
     public void mutate()
@@ -125,7 +125,7 @@ public class NeuralNetWork : IComparable<NeuralNetWork>
         {
             for (int j = 0; j < weights[i].Length; j++) //durchgeht alle neurons j
             {
-                for (int k = 0; k < weights[i][j].Length; k++) //ändert alle weights k im neuron j auf layer i
+                for (int k = 0; k < weights[i][j].Length; k++) //Ã¤ndert alle weights k im neuron j auf layer i
                 {
                     float weight = weights[i][j][k];
 
